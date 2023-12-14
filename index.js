@@ -2,8 +2,6 @@ const core = require('@actions/core');
 const S3 = require('aws-sdk/clients/s3');
 const fs = require('fs');
 const path = require('path');
-const shortid = require('shortid');
-const slash = require('slash').default;
 const klawSync = require('klaw-sync');
 const { lookup } = require('mime-types');
 
@@ -36,7 +34,6 @@ if (ENDPOINT) {
 }
 
 const s3 = new S3(s3options);
-const destinationDir = DESTINATION_DIR === '/' ? shortid() : DESTINATION_DIR;
 const paths = klawSync(SOURCE_DIR, {
   nodir: true,
 });
@@ -58,7 +55,7 @@ function run() {
     paths.map((p) => {
       const fileStream = fs.createReadStream(p.path);
       const bucketPath = slash(
-        path.join(destinationDir, slash(path.relative(sourceDir, p.path)))
+        path.join(DESTINATION_DIR, slash(path.relative(sourceDir, p.path)))
       );
       const params = {
         Bucket: BUCKET,
@@ -70,6 +67,15 @@ function run() {
       return upload(params);
     })
   );
+}
+
+function slash(path) {
+	const isExtendedLengthPath = path.startsWith('\\\\?\\');
+	if (isExtendedLengthPath) {
+		return path;
+	}
+
+	return path.replace(/\\/g, '/');
 }
 
 run()
