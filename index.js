@@ -80,9 +80,9 @@ function slash(path) {
 
 run()
   .then((locations) => {
-    core.info(`object key - ${destinationDir}`);
+    core.info(`object key - ${DESTINATION_DIR}`);
     core.info(`object locations - ${locations}`);
-    core.setOutput('object_key', destinationDir);
+    core.setOutput('object_key', DESTINATION_DIR);
     core.setOutput('object_locations', locations);
   })
   .catch((err) => {
